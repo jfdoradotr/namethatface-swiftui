@@ -12,10 +12,11 @@ struct ContentView: View {
   var body: some View {
     NavigationStack {
       VStack {
-        Image(systemName: "globe")
-          .imageScale(.large)
-          .foregroundStyle(.tint)
-        Text("Hello, world!")
+        ContentUnavailableView(
+          "No Picture",
+          systemImage: "photo.badge.plus",
+          description: Text("Tap to import a photo")
+        )
       }
       .toolbar {
         ToolbarItem {
