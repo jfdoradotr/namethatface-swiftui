@@ -19,7 +19,10 @@ struct ContentView: View {
       }
       .toolbar {
         ToolbarItem {
-          PhotosPicker(selection: $pickerItem, matching: .images) {
+          PhotosPicker(
+            selection: $pickerItem,
+            matching: .any(of: [.images, .not(.screenshots)])
+          ) {
             Label("Select an image", systemImage: "photo.badge.plus")
           }
         }
