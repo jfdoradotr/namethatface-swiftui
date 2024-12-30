@@ -5,10 +5,15 @@
 import PhotosUI
 import SwiftUI
 
+struct Face: Identifiable {
+  let id = UUID()
+  let data: Data
+  var name: String
+}
+
 struct ContentView: View {
   @State private var pickerItem: PhotosPickerItem?
-  @State private var selectedImageData: Data?
-  @State private var newFaceAdded = false
+  @State private var newFaceAdded: Face?
 
   var body: some View {
     NavigationStack {
@@ -31,15 +36,14 @@ struct ContentView: View {
       }
       .onChange(of: pickerItem) {
         Task {
-          selectedImageData = try await pickerItem?.loadTransferable(type: Data.self)
-          newFaceAdded = true
+          if let data = try await pickerItem?.loadTransferable(type: Data.self) {
+            newFaceAdded = Face(data: data, name: "")
+          }
         }
       }
-      .sheet(isPresented: $newFaceAdded) {
-        if let data = selectedImageData {
-          AddView(imageData: data)
-            .interactiveDismissDisabled()
-        }
+      .sheet(item: $newFaceAdded) { face in
+        AddView(imageData: face.data) { _ in }
+          .interactiveDismissDisabled()
       }
     }
   }
