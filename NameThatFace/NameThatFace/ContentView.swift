@@ -7,7 +7,8 @@ import SwiftUI
 
 struct ContentView: View {
   @State private var pickerItem: PhotosPickerItem?
-  @State private var selectedImage: Image?
+  @State private var selectedImageData: Data?
+  @State private var newFaceAdded = false
 
   var body: some View {
     NavigationStack {
@@ -26,6 +27,18 @@ struct ContentView: View {
           ) {
             Label("Select an image", systemImage: "photo.badge.plus")
           }
+        }
+      }
+      .onChange(of: pickerItem) {
+        Task {
+          selectedImageData = try await pickerItem?.loadTransferable(type: Data.self)
+          newFaceAdded = true
+        }
+      }
+      .sheet(isPresented: $newFaceAdded) {
+        if let data = selectedImageData {
+          AddView(imageData: data)
+            .interactiveDismissDisabled()
         }
       }
     }
