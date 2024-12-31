@@ -139,11 +139,17 @@ private extension ContentView {
 private extension ContentView {
   struct NoPictureStateView: View {
     var body: some View {
-      ContentUnavailableView(
-        "No Picture",
-        systemImage: "photo.badge.plus",
-        description: Text("Tap to import a photo")
-      )
+      VStack {
+        Image(systemName: "photo.fill.on.rectangle.fill")
+          .font(.system(size: 64))
+          .foregroundStyle(.gray)
+        Text("No Pictures Added")
+          .font(.headline)
+          .foregroundStyle(.secondary)
+        Text("Tap the button above to add your first photo.")
+          .font(.subheadline)
+          .foregroundStyle(.secondary)
+      }
     }
   }
 }
