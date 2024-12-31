@@ -3,20 +3,40 @@
 //
 
 import PhotosUI
+import SwiftData
 import SwiftUI
 
-struct Face: Identifiable {
-  let id = UUID()
-  let data: Data
+@Model
+class Face: Hashable, Decodable {
+  var id: UUID
+  @Attribute(.externalStorage) var data: Data
   var name: String
 
   var uiImage: UIImage { UIImage(data: data)! }
+
+  init(id: UUID, data: Data, name: String) {
+    self.id = id
+    self.data = data
+    self.name = name
+  }
+
+  enum CodingKeys: CodingKey {
+    case id, data, name
+  }
+
+  required init(from decoder: any Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(UUID.self, forKey: .id)
+    self.data = try container.decode(Data.self, forKey: .data)
+    self.name = try container.decode(String.self, forKey: .name)
+  }
 }
 
 struct ContentView: View {
+  @Environment(\.modelContext) private var modelContext
   @State private var pickerItem: PhotosPickerItem?
   @State private var newFaceAdded: Face?
-  @State private var faces = [Face]()
+  @Query(sort: \Face.name) private var faces: [Face]
 
   private let columns = [GridItem(.adaptive(minimum: 150))]
 
@@ -32,7 +52,7 @@ struct ContentView: View {
         } else {
           ScrollView {
             LazyVGrid(columns: columns) {
-              ForEach(faces) { face in
+              ForEach(faces, id: \.id) { face in
                 VStack {
                   Image(uiImage: face.uiImage)
                     .resizable()
@@ -74,14 +94,22 @@ struct ContentView: View {
       .onChange(of: pickerItem) {
         Task {
           if let data = try await pickerItem?.loadTransferable(type: Data.self) {
-            newFaceAdded = Face(data: data, name: "")
+            newFaceAdded = Face(
+              id: UUID(),
+              data: data,
+              name: ""
+            )
           }
         }
       }
       .sheet(item: $newFaceAdded) { face in
         AddView(imageData: face.data) { name in
-          let newFace = Face(data: face.data, name: name)
-          faces.append(newFace)
+          let newFace = Face(
+            id: UUID(),
+            data: face.data,
+            name: name
+          )
+          modelContext.insert(newFace)
           newFaceAdded = nil
         }
         .interactiveDismissDisabled()
