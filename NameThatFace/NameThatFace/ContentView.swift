@@ -186,7 +186,10 @@ private extension ContentView {
           .padding(.vertical)
         VStack {
           Text(name)
-            .font(.headline)
+            .font(.caption)
+            .padding(5)
+            .background(Color.black.opacity(0.7))
+            .clipShape(Capsule())
             .foregroundStyle(.white)
         }
         .padding()
