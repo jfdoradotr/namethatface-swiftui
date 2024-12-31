@@ -13,11 +13,8 @@ struct ContentView: View {
   @State private var newFaceAdded: Face?
   @State private var authenticationError = "Unknown error"
   @State private var isShowingAuthenticationError = false
-  @Query(sort: \Face.name) private var faces: [Face]
-
-  private let columns = [GridItem(.adaptive(minimum: 150))]
-
   @State private var authenticationState = AuthenticationState.locked
+  @Query(sort: \Face.name) private var faces: [Face]
 
   private enum AuthenticationState {
     case locked
@@ -31,17 +28,7 @@ struct ContentView: View {
           if faces.isEmpty {
             NoPictureStateView()
           } else {
-            ScrollView {
-              LazyVGrid(columns: columns) {
-                ForEach(faces, id: \.id) { face in
-                  NavigationLink(value: face) {
-                    RowItem(uiImage: face.uiImage, name: face.name)
-                  }
-                }
-              }
-              .padding(.horizontal)
-            }
-            .scrollBounceBehavior(.basedOnSize)
+            FaceListView(faces: faces)
           }
         }
         .navigationTitle("Name That Face")
@@ -58,30 +45,18 @@ struct ContentView: View {
         .onChange(of: pickerItem) {
           Task {
             if let data = try await pickerItem?.loadTransferable(type: Data.self) {
-              newFaceAdded = Face(
-                id: UUID(),
-                data: data,
-                name: ""
-              )
+              newFaceAdded = Face(id: UUID(), data: data, name: "")
             }
           }
         }
         .sheet(item: $newFaceAdded) { face in
           AddView(imageData: face.data) { name in
-            let newFace = Face(
-              id: UUID(),
-              data: face.data,
-              name: name
-            )
-            modelContext.insert(newFace)
-            newFaceAdded = nil
+            save(face: face, name: name)
           }
           .interactiveDismissDisabled()
         }
         .navigationDestination(for: Face.self) { face in
-          DetailView(face: face) {
-            modelContext.delete($0)
-          }
+          DetailView(face: face, onDelete: delete)
         }
       }
     } else {
@@ -93,26 +68,68 @@ struct ContentView: View {
         }
     }
   }
+}
+
+// MARK: -  Authentication
+
+private extension ContentView {
+  func save(face: Face, name: String) {
+    let newFace = Face(
+      id: UUID(),
+      data: face.data,
+      name: name
+    )
+    modelContext.insert(newFace)
+    newFaceAdded = nil
+  }
+
+  func delete(face: Face) {
+    modelContext.delete(face)
+  }
 
   func authenticate() {
-        let context = LAContext()
-        var error: NSError?
+    let context = LAContext()
+    var error: NSError?
 
-        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-          let reason = "Please authenticate yourself to unlock."
-          context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
-            if success {
-              self.authenticationState = .unlocked
-            } else {
-              self.authenticationError = "There was an error authenticating you; please try again."
-              self.isShowingAuthenticationError = true
-            }
-          }
+    if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+      let reason = "Please authenticate yourself to unlock."
+      context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
+        if success {
+          self.authenticationState = .unlocked
         } else {
-          authenticationError = "Sorry, your device does not support biometric authentication"
-          isShowingAuthenticationError = true
+          self.authenticationError = "There was an error authenticating you; please try again."
+          self.isShowingAuthenticationError = true
         }
       }
+    } else {
+      authenticationError = "Sorry, your device does not support biometric authentication"
+      isShowingAuthenticationError = true
+    }
+  }
+}
+
+// MARK: - FaceListView
+
+private extension ContentView {
+  struct FaceListView: View {
+    private let columns = [GridItem(.adaptive(minimum: 150))]
+
+    let faces: [Face]
+
+    var body: some View {
+      ScrollView {
+        LazyVGrid(columns: columns) {
+          ForEach(faces, id: \.id) { face in
+            NavigationLink(value: face) {
+              RowItem(uiImage: face.uiImage, name: face.name)
+            }
+          }
+        }
+        .padding(.horizontal)
+      }
+      .scrollBounceBehavior(.basedOnSize)
+    }
+  }
 }
 
 // MARK: - NoPictureStateView
@@ -176,6 +193,8 @@ private extension ContentView {
     }
   }
 }
+
+// MARK: - Previews
 
 #Preview {
   ContentView()
