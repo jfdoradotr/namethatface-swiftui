@@ -255,6 +255,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "We save faces so we must confirm you are the owner of the device, because of the sensitive data";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need to get your current location so we can pin on a map where was the place where you saved that face";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -284,6 +285,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "We save faces so we must confirm you are the owner of the device, because of the sensitive data";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need to get your current location so we can pin on a map where was the place where you saved that face";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
