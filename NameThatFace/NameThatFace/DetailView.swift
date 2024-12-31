@@ -27,9 +27,17 @@ struct DetailView: View {
 
   var body: some View {
     VStack {
-      Image(uiImage: face.uiImage)
-        .resizable()
-        .scaledToFit()
+      VStack {
+        Image(uiImage: face.uiImage)
+          .resizable()
+          .scaledToFit()
+          .clipShape(RoundedRectangle(cornerRadius: 12))
+          .shadow(radius: 5)
+      }
+      .padding()
+      .background(Color(.secondarySystemBackground))
+      .clipShape(RoundedRectangle(cornerRadius: 16))
+      .shadow(radius: 5)
       if let startPosition, let coordinates = face.coordinates {
         Map(initialPosition: startPosition) {
           Marker(coordinate: coordinates, label: { Text(face.name) })
