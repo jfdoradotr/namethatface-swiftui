@@ -108,11 +108,7 @@ struct ContentView: View {
         }
       }
     } else {
-      Button("Unlock", action: authenticate)
-        .padding()
-        .background(.blue)
-        .foregroundStyle(.white)
-        .clipShape(.capsule)
+      AuthButton(action: authenticate)
         .alert("Authentication error", isPresented: $isShowingAuthenticationError) {
           Button("OK") { }
         } message: {
@@ -140,6 +136,22 @@ struct ContentView: View {
           isShowingAuthenticationError = true
         }
       }
+}
+
+// MARK: - AuthButton
+
+private extension ContentView {
+  struct AuthButton: View {
+    let action: () -> Void
+
+    var body: some View {
+      Button("Unlock", action: action)
+        .padding()
+        .background(.blue)
+        .foregroundStyle(.white)
+        .clipShape(.capsule)
+    }
+  }
 }
 
 #Preview {
