@@ -120,7 +120,7 @@ private extension ContentView {
 
     var body: some View {
       ScrollView {
-        LazyVGrid(columns: columns) {
+        LazyVGrid(columns: columns, spacing: 10) {
           ForEach(faces, id: \.id) { face in
             NavigationLink(value: face) {
               RowItem(uiImage: face.uiImage, name: face.name)
@@ -188,25 +188,18 @@ private extension ContentView {
         Image(uiImage: uiImage)
           .resizable()
           .scaledToFit()
-          .frame(width: 100, height: 100)
-          .padding(.vertical)
-        VStack {
-          Text(name)
-            .font(.caption)
-            .padding(5)
-            .background(Color.black.opacity(0.7))
-            .clipShape(Capsule())
-            .foregroundStyle(.white)
-        }
-        .padding()
-        .frame(maxWidth: .infinity)
-        .background(Color.secondary.opacity(0.75))
+          .frame(width: 120, height: 120)
+          .clipShape(RoundedRectangle(cornerRadius: 10))
+          .shadow(radius: 3)
+        Text(name)
+          .font(.headline)
+          .foregroundStyle(.primary)
+          .lineLimit(1)
       }
-      .clipShape(.rect(cornerRadius: 10))
-      .overlay(
-        RoundedRectangle(cornerRadius: 10, style: .continuous)
-          .stroke(Color.secondary)
-      )
+      .padding()
+      .background(Color(.systemBackground))
+      .clipShape(RoundedRectangle(cornerRadius: 12))
+      .shadow(radius: 5)
     }
   }
 }
