@@ -155,11 +155,17 @@ private extension ContentView {
     let action: () -> Void
 
     var body: some View {
-      Button("Unlock", action: action)
+      Button(action: action) {
+        HStack {
+          Image(systemName: "lock.fill")
+          Text("Unlock")
+        }
+        .font(.headline)
         .padding()
-        .background(.blue)
+        .background(Color.blue.gradient)
         .foregroundStyle(.white)
         .clipShape(.capsule)
+      }
     }
   }
 }
