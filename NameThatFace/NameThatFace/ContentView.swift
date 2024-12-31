@@ -16,6 +16,8 @@ struct ContentView: View {
   @State private var authenticationState = AuthenticationState.locked
   @Query(sort: \Face.name) private var faces: [Face]
 
+  private let locationFetcher = LocationFetcher()
+
   private enum AuthenticationState {
     case locked
     case unlocked
@@ -41,6 +43,9 @@ struct ContentView: View {
               Label("Select an image", systemImage: "photo.badge.plus")
             }
           }
+        }
+        .onAppear {
+          locationFetcher.start()
         }
         .onChange(of: pickerItem) {
           Task {
