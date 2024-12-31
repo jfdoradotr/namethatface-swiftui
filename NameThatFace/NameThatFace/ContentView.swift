@@ -53,26 +53,28 @@ struct ContentView: View {
           ScrollView {
             LazyVGrid(columns: columns) {
               ForEach(faces, id: \.id) { face in
-                VStack {
-                  Image(uiImage: face.uiImage)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 100, height: 100)
-                    .padding(.vertical)
+                NavigationLink(value: face) {
                   VStack {
-                    Text(face.name)
-                      .font(.headline)
-                      .foregroundStyle(.white)
+                    Image(uiImage: face.uiImage)
+                      .resizable()
+                      .scaledToFit()
+                      .frame(width: 100, height: 100)
+                      .padding(.vertical)
+                    VStack {
+                      Text(face.name)
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.secondary.opacity(0.75))
                   }
-                  .padding()
-                  .frame(maxWidth: .infinity)
-                  .background(Color.secondary.opacity(0.75))
+                  .clipShape(.rect(cornerRadius: 10))
+                  .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                      .stroke(Color.secondary)
+                  )
                 }
-                .clipShape(.rect(cornerRadius: 10))
-                .overlay(
-                  RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(Color.secondary)
-                )
               }
             }
             .padding(.horizontal)
@@ -113,6 +115,11 @@ struct ContentView: View {
           newFaceAdded = nil
         }
         .interactiveDismissDisabled()
+      }
+      .navigationDestination(for: Face.self) { face in
+        DetailView(face: face) {
+          modelContext.delete($0)
+        }
       }
     }
   }
