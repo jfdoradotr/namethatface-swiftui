@@ -11,15 +11,21 @@ struct ContentView: View {
   @Environment(\.modelContext) private var modelContext
   @State private var pickerItem: PhotosPickerItem?
   @State private var newFaceAdded: Face?
-  @State private var isUnlocked = false
   @State private var authenticationError = "Unknown error"
   @State private var isShowingAuthenticationError = false
   @Query(sort: \Face.name) private var faces: [Face]
 
   private let columns = [GridItem(.adaptive(minimum: 150))]
 
+  @State private var authenticationState = AuthenticationState.locked
+
+  private enum AuthenticationState {
+    case locked
+    case unlocked
+  }
+
   var body: some View {
-    if isUnlocked {
+    if authenticationState == .unlocked {
       NavigationStack {
         VStack {
           if faces.isEmpty {
@@ -123,7 +129,7 @@ struct ContentView: View {
           let reason = "Please authenticate yourself to unlock."
           context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
             if success {
-              self.isUnlocked = true
+              self.authenticationState = .unlocked
             } else {
               self.authenticationError = "There was an error authenticating you; please try again."
               self.isShowingAuthenticationError = true
