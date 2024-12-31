@@ -16,8 +16,6 @@ struct ContentView: View {
   @State private var authenticationState = AuthenticationState.locked
   @Query(sort: \Face.name) private var faces: [Face]
 
-  private let locationFetcher = LocationFetcher()
-
   private enum AuthenticationState {
     case locked
     case unlocked
@@ -44,19 +42,16 @@ struct ContentView: View {
             }
           }
         }
-        .onAppear {
-          locationFetcher.start()
-        }
         .onChange(of: pickerItem) {
           Task {
             if let data = try await pickerItem?.loadTransferable(type: Data.self) {
-              newFaceAdded = Face(id: UUID(), data: data, name: "")
+              newFaceAdded = Face(id: UUID(), data: data, name: "", latitude: nil, longitude: nil)
             }
           }
         }
         .sheet(item: $newFaceAdded) { face in
-          AddView(imageData: face.data) { name in
-            save(face: face, name: name)
+          AddView(imageData: face.data) { name, coordinates in
+            save(face: face, name: name, latitude: coordinates.0, longitude: coordinates.1)
           }
           .interactiveDismissDisabled()
         }
@@ -78,11 +73,13 @@ struct ContentView: View {
 // MARK: -  Authentication
 
 private extension ContentView {
-  func save(face: Face, name: String) {
+  func save(face: Face, name: String, latitude: Double?, longitude: Double?) {
     let newFace = Face(
       id: UUID(),
       data: face.data,
-      name: name
+      name: name,
+      latitude: latitude,
+      longitude: longitude
     )
     modelContext.insert(newFace)
     newFaceAdded = nil
