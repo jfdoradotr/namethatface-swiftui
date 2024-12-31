@@ -124,10 +124,13 @@ private extension ContentView {
           ForEach(faces, id: \.id) { face in
             NavigationLink(value: face) {
               RowItem(uiImage: face.uiImage, name: face.name)
+                .transition(.scale)
+                .animation(.easeInOut(duration: 0.2), value: faces.count)
             }
+            .buttonStyle(.plain)
           }
         }
-        .padding(.horizontal)
+        .padding(.horizontal, 16)
       }
       .scrollBounceBehavior(.basedOnSize)
     }
@@ -184,22 +187,29 @@ private extension ContentView {
     let name: String
 
     var body: some View {
-      VStack {
+      VStack(spacing: 10) {
         Image(uiImage: uiImage)
           .resizable()
-          .scaledToFit()
-          .frame(width: 120, height: 120)
-          .clipShape(RoundedRectangle(cornerRadius: 10))
-          .shadow(radius: 3)
+          .scaledToFill()
+          .frame(width: 130, height: 130)
+          .clipShape(RoundedRectangle(cornerRadius: 15))
+          .shadow(color: .gray.opacity(0.3), radius: 5, x: 0, y: 3)
+
         Text(name)
           .font(.headline)
-          .foregroundStyle(.primary)
-          .lineLimit(1)
+          .foregroundColor(.white)
+          .padding(.vertical, 4)
+          .padding(.horizontal, 8)
+          .background(Color.blue.opacity(0.8))
+          .clipShape(Capsule())
       }
       .padding()
-      .background(Color(.systemBackground))
-      .clipShape(RoundedRectangle(cornerRadius: 12))
-      .shadow(radius: 5)
+      .background(
+        RoundedRectangle(cornerRadius: 15)
+          .fill(Color(.secondarySystemBackground))
+          .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 5)
+      )
+      .padding(5)
     }
   }
 }
