@@ -29,36 +29,13 @@ struct ContentView: View {
       NavigationStack {
         VStack {
           if faces.isEmpty {
-            ContentUnavailableView(
-              "No Picture",
-              systemImage: "photo.badge.plus",
-              description: Text("Tap to import a photo")
-            )
+            NoPictureStateView()
           } else {
             ScrollView {
               LazyVGrid(columns: columns) {
                 ForEach(faces, id: \.id) { face in
                   NavigationLink(value: face) {
-                    VStack {
-                      Image(uiImage: face.uiImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 100, height: 100)
-                        .padding(.vertical)
-                      VStack {
-                        Text(face.name)
-                          .font(.headline)
-                          .foregroundStyle(.white)
-                      }
-                      .padding()
-                      .frame(maxWidth: .infinity)
-                      .background(Color.secondary.opacity(0.75))
-                    }
-                    .clipShape(.rect(cornerRadius: 10))
-                    .overlay(
-                      RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .stroke(Color.secondary)
-                    )
+                    RowItem(uiImage: face.uiImage, name: face.name)
                   }
                 }
               }
@@ -138,6 +115,20 @@ struct ContentView: View {
       }
 }
 
+// MARK: - NoPictureStateView
+
+private extension ContentView {
+  struct NoPictureStateView: View {
+    var body: some View {
+      ContentUnavailableView(
+        "No Picture",
+        systemImage: "photo.badge.plus",
+        description: Text("Tap to import a photo")
+      )
+    }
+  }
+}
+
 // MARK: - AuthButton
 
 private extension ContentView {
@@ -150,6 +141,38 @@ private extension ContentView {
         .background(.blue)
         .foregroundStyle(.white)
         .clipShape(.capsule)
+    }
+  }
+}
+
+// MARK: - RowItem
+
+private extension ContentView {
+  struct RowItem: View {
+    let uiImage: UIImage
+    let name: String
+
+    var body: some View {
+      VStack {
+        Image(uiImage: uiImage)
+          .resizable()
+          .scaledToFit()
+          .frame(width: 100, height: 100)
+          .padding(.vertical)
+        VStack {
+          Text(name)
+            .font(.headline)
+            .foregroundStyle(.white)
+        }
+        .padding()
+        .frame(maxWidth: .infinity)
+        .background(Color.secondary.opacity(0.75))
+      }
+      .clipShape(.rect(cornerRadius: 10))
+      .overlay(
+        RoundedRectangle(cornerRadius: 10, style: .continuous)
+          .stroke(Color.secondary)
+      )
     }
   }
 }
